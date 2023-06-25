@@ -78,14 +78,14 @@ public final class ImportCandidates implements Iterable<String> {
 	 * @return list of names of annotated classes
 	 */
 	public static ImportCandidates load(Class<?> annotation, ClassLoader classLoader) {
-		Assert.notNull(annotation, "'annotation' must not be null");
+		Assert.notNull(annotation, "'annotation' must not be null");//annotation=org.springframework.boot.autoconfigure.AutoConfiguration
 		ClassLoader classLoaderToUse = decideClassloader(classLoader);
-		String location = String.format(LOCATION, annotation.getName());
-		Enumeration<URL> urls = findUrlsInClasspath(classLoaderToUse, location);
+		String location = String.format(LOCATION, annotation.getName());//location=META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+		Enumeration<URL> urls = findUrlsInClasspath(classLoaderToUse, location);//指定类加载器classLoaderToUse
 		List<String> importCandidates = new ArrayList<>();
 		while (urls.hasMoreElements()) {
-			URL url = urls.nextElement();
-			importCandidates.addAll(readCandidateConfigurations(url));
+			URL url = urls.nextElement();//file:/Users/moriu/gitHub/spring-boot/spring-boot-project/spring-boot-autoconfigure/build/libs/spring-boot-autoconfigure-3.0.9-SNAPSHOT.jar!/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+			importCandidates.addAll(readCandidateConfigurations(url));//通过url文件路径拿去所有的 autoconfiguration
 		}
 		return new ImportCandidates(importCandidates);
 	}

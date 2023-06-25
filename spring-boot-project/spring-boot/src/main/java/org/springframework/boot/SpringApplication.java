@@ -267,11 +267,11 @@ public class SpringApplication {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
-		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+		this.webApplicationType = WebApplicationType.deduceFromClasspath();//SpringMvcApplication的实例
 		this.bootstrapRegistryInitializers = new ArrayList<>(
 				getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
-		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
-		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));// 这里会处理加载所有的spring.factories文件的内容到缓存 找到*META-INF/spring.factories*中声明的所有ApplicationContextInitializer的实现类并将其实例化
+		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));////找到*META-INF/spring.factories*中声明的所有ApplicationListener的实现类并将其实例化
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
