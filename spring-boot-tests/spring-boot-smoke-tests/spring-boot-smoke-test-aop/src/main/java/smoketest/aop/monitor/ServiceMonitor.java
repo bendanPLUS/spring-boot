@@ -28,7 +28,7 @@ public class ServiceMonitor {
 
 	@AfterReturning("execution(* smoketest..*Service.*(..))")
 	public void logServiceAccess(JoinPoint joinPoint) {
-		System.out.println("Completed: " + joinPoint);
+		System.out.println("AOP Completed: " + joinPoint);
 	}
 
 }
