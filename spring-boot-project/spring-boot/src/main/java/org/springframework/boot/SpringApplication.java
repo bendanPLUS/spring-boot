@@ -262,17 +262,20 @@ public class SpringApplication {
 	 * @see #run(Class, String[])
 	 * @see #setSources(Set)
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes" }) //构造器?构造函数?
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
-		this.webApplicationType = WebApplicationType.deduceFromClasspath();//SpringMvcApplication的实例
+		this.webApplicationType = WebApplicationType.deduceFromClasspath();//推断应用文类型 SpringMvcApplication的实例
 		this.bootstrapRegistryInitializers = new ArrayList<>(
 				getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
-		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));// 这里会处理加载所有的spring.factories文件的内容到缓存 找到*META-INF/spring.factories*中声明的所有ApplicationContextInitializer的实现类并将其实例化
-		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));////找到*META-INF/spring.factories*中声明的所有ApplicationListener的实现类并将其实例化
-		this.mainApplicationClass = deduceMainApplicationClass();
+		// 这里会处理加载所有的spring.factories文件的内容到缓存
+		// 找到*META-INF/spring.factories*中声明的所有ApplicationContextInitializer的实现类并将其实例化
+		setInitializers( (Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class) );//set spring应用上下文初始化器
+		//找到*META-INF/spring.factories*中声明的所有ApplicationListener的实现类并将其实例化
+		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));//set spring应用时间监听器
+		this.mainApplicationClass = deduceMainApplicationClass();//推断应用引导类
 	}
 
 	private Class<?> deduceMainApplicationClass() {
@@ -292,7 +295,7 @@ public class SpringApplication {
 	 * {@link ApplicationContext}.
 	 * @param args the application arguments (usually passed from a Java main method)
 	 * @return a running {@link ApplicationContext}
-	 */
+	 *///核心对象依次:ApplicationArguments SpringApplicationRunListeners ConfigurableEnvironment Banner ConfigurableApplicationContext SpringBootExceptionReporter
 	public ConfigurableApplicationContext run(String... args) {
 		long startTime = System.nanoTime();
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
@@ -300,14 +303,15 @@ public class SpringApplication {
 		configureHeadlessProperty();
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
-		try {
+		try {//在完成对 AnnotationConfigApplicationContext的 创建 准备 刷新 的过程
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			Banner printedBanner = printBanner(environment);
-			context = createApplicationContext();
+			context = createApplicationContext();//1.创建
 			context.setApplicationStartup(this.applicationStartup);
-			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
-			refreshContext(context);
+			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);//2.准备
+			/* 至此之前为: applicationContext启动前的准备阶段 */
+			refreshContext(context);//3.刷新
 			afterRefresh(context, applicationArguments);
 			Duration timeTakenToStartup = Duration.ofNanos(System.nanoTime() - startTime);
 			if (this.logStartupInfo) {
@@ -443,7 +447,7 @@ public class SpringApplication {
 		ArgumentResolver argumentResolver = ArgumentResolver.of(SpringApplication.class, this);
 		argumentResolver = argumentResolver.and(String[].class, args);
 		List<SpringApplicationRunListener> listeners = getSpringFactoriesInstances(SpringApplicationRunListener.class,
-				argumentResolver);
+				argumentResolver);//根据factoryType Name 从factories集合中拿去相应类型的对象 即:SpringApplicationRunListener类型在配置文件中的对象 路径spring-boot-project/spring-boot/src/main/resources/META-INF/spring.factories
 		SpringApplicationHook hook = applicationHook.get();
 		SpringApplicationRunListener hookListener = (hook != null) ? hook.getRunListener(this) : null;
 		if (hookListener != null) {
@@ -1301,7 +1305,7 @@ public class SpringApplication {
 	 * @return the running {@link ApplicationContext}
 	 */
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
-		return new SpringApplication(primarySources).run(args);
+		return new SpringApplication(primarySources).run(args); //new SpringApplication 进行了SpringApplication构造函数初始化的过程
 	}
 
 	/**
