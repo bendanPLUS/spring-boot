@@ -173,6 +173,8 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		super.doClose();
 	}
 
+	//springboot启动时 refresh->onRefresh 创建tomcatWebServer此方法
+	//此方法调用一个getSelfInitializer()方法 把SpringMVC
 	private void createWebServer() {
 		WebServer webServer = this.webServer;
 		ServletContext servletContext = getServletContext();

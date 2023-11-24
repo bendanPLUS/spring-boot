@@ -301,18 +301,19 @@ public class SpringApplication {
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
 		configureHeadlessProperty();
-		SpringApplicationRunListeners listeners = getRunListeners(args);
+		SpringApplicationRunListeners listeners = getRunListeners(args); // 事件监听
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
-		try {//在完成对 AnnotationConfigApplicationContext的 创建 准备 刷新 的过程
-			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+		try { //在完成对 AnnotationConfigApplicationContext的 创建 准备 刷新 的过程
+			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args); // 装配applicationArguments
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			Banner printedBanner = printBanner(environment);
-			context = createApplicationContext();//1.创建
+			/* 创建AnnotationConfigServletWebServerApplicationContext 且在构造函数中创建的reader和scanner 尤其是AnnotatedBeanDefinitionReader的创建同时 手动注册了很多 后置处理器的BeanDefinition  (入口:AnnotationConfigUtils.registerAnnotationConfigProcessors 查看)*/
+			context = createApplicationContext(); //1.创建spring应用上下文 applicationContext 比如设置BeanFactory 加载beanFactory的后置处理器:beanFactoryPostProcessors 和 registerBeanDefinition相关内部的 BeanDefinition
 			context.setApplicationStartup(this.applicationStartup);
-			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);//2.准备
+			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner); //2.spring应用上下文 运行前的 准备阶段
 			/* 至此之前为: applicationContext启动前的准备阶段 */
-			refreshContext(context);//3.刷新
-			afterRefresh(context, applicationArguments);
+			refreshContext(context); //3.spring应用上下文启动阶段 也叫刷新
+			afterRefresh(context, applicationArguments); //4.spring应用上下文启动后阶段 空方法 交给程序员自行扩展
 			Duration timeTakenToStartup = Duration.ofNanos(System.nanoTime() - startTime);
 			if (this.logStartupInfo) {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), timeTakenToStartup);
@@ -380,14 +381,12 @@ public class SpringApplication {
 		return environmentType;
 	}
 
-	private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context,
-			ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
-			ApplicationArguments applicationArguments, Banner printedBanner) {
-		context.setEnvironment(environment);
-		postProcessApplicationContext(context);
+	private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context, ConfigurableEnvironment environment, SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
+		context.setEnvironment(environment); //设置配置环境变量
+		postProcessApplicationContext(context); // spring应用上下文context的后置处理
 		addAotGeneratedInitializerIfNecessary(this.initializers);
-		applyInitializers(context);
-		listeners.contextPrepared(context);
+		applyInitializers(context); //应用spring应用上下文context 上下文初始化器
+		listeners.contextPrepared(context); // spring应用上下文创建+准备完毕时,该方法被回调
 		bootstrapContext.close(context);
 		if (this.logStartupInfo) {
 			logStartupInfo(context.getParent() == null);
@@ -395,7 +394,7 @@ public class SpringApplication {
 		}
 		// Add boot specific singleton beans
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
+		beanFactory.registerSingleton("springApplicationArguments", applicationArguments); // 注册 一些bean
 		if (printedBanner != null) {
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
 		}
@@ -411,11 +410,11 @@ public class SpringApplication {
 		context.addBeanFactoryPostProcessor(new PropertySourceOrderingBeanFactoryPostProcessor(context));
 		if (!AotDetector.useGeneratedArtifacts()) {
 			// Load the sources
-			Set<Object> sources = getAllSources();
+			Set<Object> sources = getAllSources(); //合并 配置源
 			Assert.notEmpty(sources, "Sources must not be empty");
 			load(context, sources.toArray(new Object[0]));
 		}
-		listeners.contextLoaded(context);
+		listeners.contextLoaded(context); // 执行SpringApplicationRunListeners方法回调
 	}
 
 	private void addAotGeneratedInitializerIfNecessary(List<ApplicationContextInitializer<?>> initializers) {

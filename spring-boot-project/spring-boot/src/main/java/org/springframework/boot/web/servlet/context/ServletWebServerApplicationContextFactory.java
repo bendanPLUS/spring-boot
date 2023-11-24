@@ -49,7 +49,7 @@ class ServletWebServerApplicationContextFactory implements ApplicationContextFac
 
 	private ConfigurableApplicationContext createContext() {
 		if (!AotDetector.useGeneratedArtifacts()) {
-			return new AnnotationConfigServletWebServerApplicationContext();
+			return new AnnotationConfigServletWebServerApplicationContext(); // 这里!
 		}
 		return new ServletWebServerApplicationContext();
 	}

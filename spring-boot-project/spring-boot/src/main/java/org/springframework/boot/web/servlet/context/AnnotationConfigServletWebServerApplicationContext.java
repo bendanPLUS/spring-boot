@@ -23,6 +23,7 @@ import java.util.Set;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotatedBeanDefinitionReader;
 import org.springframework.context.annotation.AnnotationConfigRegistry;
 import org.springframework.context.annotation.AnnotationConfigUtils;
@@ -68,6 +69,8 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 * Create a new {@link AnnotationConfigServletWebServerApplicationContext} that needs
 	 * to be populated through {@link #register} calls and then manually
 	 * {@linkplain #refresh refreshed}.
+	 *  构造函数时候就 new 了 AnnotatedBeanDefinitionReader 和 ClassPathBeanDefinitionScanner
+	 *	{@link ApplicationContext #run(String... args) context = createApplicationContext()}
 	 */
 	public AnnotationConfigServletWebServerApplicationContext() {
 		this.reader = new AnnotatedBeanDefinitionReader(this);
