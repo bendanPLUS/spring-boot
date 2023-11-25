@@ -29,9 +29,10 @@ public class SampleController {
 	@Autowired
 	private HelloWorldService helloWorldService;
 
-	@GetMapping("/")
+	@GetMapping("/helloWorld")
 	@ResponseBody
 	public String helloWorld() {
+		System.out.println("你好这是测试");
 		return this.helloWorldService.getHelloMessage();
 	}
 
