@@ -77,7 +77,7 @@ class EventPublishingRunListener implements SpringApplicationRunListener, Ordere
 
 	@Override
 	public void environmentPrepared(ConfigurableBootstrapContext bootstrapContext,
-			ConfigurableEnvironment environment) {
+									ConfigurableEnvironment environment) {
 		multicastInitialEvent(
 				new ApplicationEnvironmentPreparedEvent(bootstrapContext, this.application, this.args, environment));
 	}
@@ -89,13 +89,13 @@ class EventPublishingRunListener implements SpringApplicationRunListener, Ordere
 
 	@Override
 	public void contextLoaded(ConfigurableApplicationContext context) {
-		for (ApplicationListener<?> listener : this.application.getListeners()) {
+		for (ApplicationListener<?> listener : this.application.getListeners()) { //SpringApplication中相关的applicationListener 追加到应用上下文applicationContext中
 			if (listener instanceof ApplicationContextAware contextAware) {
 				contextAware.setApplicationContext(context);
 			}
 			context.addApplicationListener(listener);
 		}
-		multicastInitialEvent(new ApplicationPreparedEvent(this.application, this.args, context));
+		multicastInitialEvent(new ApplicationPreparedEvent(this.application, this.args, context)); //广播 ApplicationPreparedEvent事件
 	}
 
 	@Override
@@ -117,8 +117,7 @@ class EventPublishingRunListener implements SpringApplicationRunListener, Ordere
 			// Listeners have been registered to the application context so we should
 			// use it at this point if we can
 			context.publishEvent(event);
-		}
-		else {
+		} else {
 			// An inactive context may not have a multicaster so we use our multicaster to
 			// call all the context's listeners instead
 			if (context instanceof AbstractApplicationContext abstractApplicationContext) {
@@ -138,6 +137,14 @@ class EventPublishingRunListener implements SpringApplicationRunListener, Ordere
 
 	private void refreshApplicationListeners() {
 		this.application.getListeners().forEach(this.initialMulticaster::addApplicationListener);
+		//相当于:
+		/*
+		(1)
+		this.application.getListeners().forEach(key -> this.initialMulticaster.addApplicationListener(key));
+		(2)
+		for (ApplicationListener listener : this.application.getListeners())
+			this.initialMulticaster.addApplicationListener(listener);
+		*/
 	}
 
 	private static class LoggingErrorHandler implements ErrorHandler {
