@@ -98,6 +98,8 @@ dependencies {
 	optional("org.yaml:snakeyaml")
 	optional("org.jetbrains.kotlin:kotlin-reflect")
 	optional("org.jetbrains.kotlin:kotlin-stdlib")
+	//https://mvnrepository.com/artifact/com.google.code.findbugs/annotations/3.0.1 Springboot构建问题集:https://article.itxueyuan.com/2Ke2Pl
+	implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
 
 	testImplementation(project(":spring-boot-project:spring-boot-tools:spring-boot-test-support"))
 	testImplementation("org.springframework:spring-core-test")
