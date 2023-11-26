@@ -269,7 +269,7 @@ public class SpringApplication {
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
-		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));//设置启动的主类:SampleTestNGApplication
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();//推断Web环境, 基本上就是servlet环境
 		/* !新版本有一些小的改动, 新版本在此处加载META-INF/spring.factories里的key value 并存入缓存!*/
 		this.bootstrapRegistryInitializers = new ArrayList<>(getSpringFactoriesInstances(BootstrapRegistryInitializer.class)); //按照类型拿 实现BootstrapRegistryInitializer接口的
@@ -279,8 +279,8 @@ public class SpringApplication {
 		 * 执行的时机:  刷新IOD容器之前(refreshContext(context))  回调所有实现ApplicationContextInitializer接口的initialize()方法
 		 * 方法: {@link #run(String...)}->prepareContext->applyInitializers->initializer.initialize() {@link #applyInitializers}
 		 */
-		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
-		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));//set spring应用时间监听器
+		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class)); //set springApplication初始化器
+		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class)); //set springApplication事件监听器
 		this.mainApplicationClass = deduceMainApplicationClass();//推断应用引导类
 	}
 
