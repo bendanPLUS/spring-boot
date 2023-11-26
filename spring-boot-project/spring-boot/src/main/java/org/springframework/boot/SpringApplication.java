@@ -281,7 +281,7 @@ public class SpringApplication {
 		 */
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class)); //set springApplication初始化器
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class)); //set springApplication事件监听器
-		this.mainApplicationClass = deduceMainApplicationClass();//推断应用引导类
+		this.mainApplicationClass = deduceMainApplicationClass();//确定主启动类 findMainClass 找到方法名为main所在的类
 	}
 
 	private Class<?> deduceMainApplicationClass() {
