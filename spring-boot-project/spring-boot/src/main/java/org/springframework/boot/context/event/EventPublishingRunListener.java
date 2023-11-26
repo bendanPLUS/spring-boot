@@ -62,7 +62,7 @@ class EventPublishingRunListener implements SpringApplicationRunListener, Ordere
 	EventPublishingRunListener(SpringApplication application, String[] args) {
 		this.application = application;
 		this.args = args;
-		this.initialMulticaster = new SimpleApplicationEventMulticaster();
+		this.initialMulticaster = new SimpleApplicationEventMulticaster(); // 构造函数 new事件的广播器
 	}
 
 	@Override
@@ -130,9 +130,13 @@ class EventPublishingRunListener implements SpringApplicationRunListener, Ordere
 		}
 	}
 
+	/***
+	 * 初始化时就创建了一个事件广播器 {@link #EventPublishingRunListener}
+	 * 且在{@link #refreshApplicationListeners}存储了所有的监听器
+	 */
 	private void multicastInitialEvent(ApplicationEvent event) {
 		refreshApplicationListeners();
-		this.initialMulticaster.multicastEvent(event);
+		this.initialMulticaster.multicastEvent(event); // 进行事件的广播
 	}
 
 	private void refreshApplicationListeners() {

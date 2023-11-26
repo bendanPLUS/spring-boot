@@ -69,7 +69,7 @@ class SpringApplicationRunListeners {
 	}
 
 	void contextLoaded(ConfigurableApplicationContext context) {
-		doWithListeners("spring.boot.application.context-loaded", (listener) -> listener.contextLoaded(context));
+		doWithListeners("spring.boot.application.context-loaded", (listener) -> listener.contextLoaded(context)); //SpringApplicationRunListeners唯一实现类EventPublishingRunListener
 	}
 
 	void started(ConfigurableApplicationContext context, Duration timeTaken) {

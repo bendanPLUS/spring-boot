@@ -271,7 +271,10 @@ public class SpringApplication {
 		Assert.notNull(primarySources, "PrimarySources must not be null");
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));//设置启动的主类:SampleTestNGApplication
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();//推断Web环境, 基本上就是servlet环境
-		/* !新版本有一些小的改动, 新版本在此处加载META-INF/spring.factories里的key value 并存入缓存!*/
+		/* !新版本有一些小的改动, 新版本在此处加载META-INF/spring.factories里的key value 并存入缓存!
+		*  预留的一个扩展点
+		*  调用时机: run()->createBootstrapContext()
+		* */
 		this.bootstrapRegistryInitializers = new ArrayList<>(getSpringFactoriesInstances(BootstrapRegistryInitializer.class)); //按照类型拿 实现BootstrapRegistryInitializer接口的
 		/**
 		 * SpringApplication上下文初始化器
@@ -302,9 +305,10 @@ public class SpringApplication {
 		long startTime = System.nanoTime();
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
-		configureHeadlessProperty();
-		SpringApplicationRunListeners listeners = getRunListeners(args); // 事件监听
-		listeners.starting(bootstrapContext, this.mainApplicationClass);
+		configureHeadlessProperty(); //配置与awt相关的信息
+		//获取监听 并回调starting()方法
+		SpringApplicationRunListeners listeners = getRunListeners(args);
+		listeners.starting(bootstrapContext, this.mainApplicationClass); //初始化+事件的广播
 		try { //在完成对 AnnotationConfigApplicationContext的 创建 准备 刷新 的过程
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args); // 装配applicationArguments
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
@@ -434,6 +438,7 @@ public class SpringApplication {
 	}
 
 	private void configureHeadlessProperty() {
+		// 类似于getOrDefault 没有就设置null 没使用 判断有没有显示器
 		System.setProperty(SYSTEM_PROPERTY_JAVA_AWT_HEADLESS, System.getProperty(SYSTEM_PROPERTY_JAVA_AWT_HEADLESS, Boolean.toString(this.headless)));
 	}
 
