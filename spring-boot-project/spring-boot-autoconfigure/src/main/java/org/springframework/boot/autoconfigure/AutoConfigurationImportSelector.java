@@ -99,7 +99,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		if (!isEnabled(annotationMetadata)) {
 			return NO_IMPORTS;
 		}
-		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata);
+		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata);//加载 META-INF/spring 下的AutoConfiguration bean
 		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
 	}
 
@@ -123,7 +123,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			return EMPTY_ENTRY;
 		}
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
-		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);//获取所有需要自动装配的AutoConfiguration
+		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);//获取所有需要自动装配的AutoConfiguration Candidate候选
 		configurations = removeDuplicates(configurations);
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
 		checkExcludedClasses(configurations, exclusions);
@@ -306,7 +306,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	}
 
 	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {// BeanFactoryAware
 		Assert.isInstanceOf(ConfigurableListableBeanFactory.class, beanFactory);
 		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
 	}
@@ -419,6 +419,13 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		public void setResourceLoader(ResourceLoader resourceLoader) {
 			this.resourceLoader = resourceLoader;
 		}
+
+		/**
+		 * 自动装配调用时机:
+		 * {@link AutoConfigurationGroup#process(AnnotationMetadata, DeferredImportSelector)}
+		 * 执行process方法->this.group.process
+		 * 执行selectImports->this.group.selectImports()
+		 */
 
 		@Override
 		public void process(AnnotationMetadata annotationMetadata, DeferredImportSelector deferredImportSelector) {
