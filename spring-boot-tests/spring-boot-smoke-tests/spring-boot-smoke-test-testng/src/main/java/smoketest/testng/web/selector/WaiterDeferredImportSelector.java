@@ -1,7 +1,6 @@
 package smoketest.testng.web.selector;
 
 import org.springframework.boot.autoconfigure.AutoConfigurationImportSelector;
-import org.springframework.context.annotation.ConfigurationClassParser;
 import org.springframework.context.annotation.DeferredImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
 import smoketest.testng.web.component.Waiter;
@@ -59,7 +58,3 @@ public class WaiterDeferredImportSelector implements DeferredImportSelector {
 		}
 	}
 }
-
-
-
-
