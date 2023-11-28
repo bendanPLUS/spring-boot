@@ -124,15 +124,20 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		}
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);//获取所有需要自动装配的AutoConfiguration Candidate候选
-		configurations = removeDuplicates(configurations);
+		configurations = removeDuplicates(configurations); //去重
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
-		checkExcludedClasses(configurations, exclusions);
+		checkExcludedClasses(configurations, exclusions); //去除排除的
 		configurations.removeAll(exclusions);
 		configurations = getConfigurationClassFilter().filter(configurations);
 		fireAutoConfigurationImportEvents(configurations, exclusions);
-		return new AutoConfigurationEntry(configurations, exclusions);
+		return new AutoConfigurationEntry(configurations, exclusions); //封装成对象(数据存放在list configurations属性中)
 	}
 
+	/**
+	 * @see AutoConfigurationGroup
+	 * 有一个分组的概念 实现了DeferredImportSelector.Group接口
+	 * 真正负责加载所有配置类的入口{@link AutoConfigurationGroup#process(AnnotationMetadata, DeferredImportSelector)}
+	 */
 	@Override
 	public Class<? extends Group> getImportGroup() {
 		return AutoConfigurationGroup.class;
@@ -177,7 +182,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @return a list of candidate configurations
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
-		List<String> configurations = ImportCandidates.load(AutoConfiguration.class, getBeanClassLoader())
+		List<String> configurations = ImportCandidates.load(AutoConfiguration.class, getBeanClassLoader()) //JDK17 不放在spring.factories 是单独的目录:META-INF/spring
 			.getCandidates();
 		Assert.notEmpty(configurations,
 				"No auto configuration classes found in "
@@ -433,8 +438,11 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 					() -> String.format("Only %s implementations are supported, got %s",
 							AutoConfigurationImportSelector.class.getSimpleName(),
 							deferredImportSelector.getClass().getName()));
+			/**拿到自动化装配的所有配置类放入对象:{@link AutoConfigurationEntry#configurations}的属性中*/
+			//String[] strings = deferredImportSelector.selectImports(annotationMetadata);
 			AutoConfigurationEntry autoConfigurationEntry = ((AutoConfigurationImportSelector) deferredImportSelector)
 				.getAutoConfigurationEntry(annotationMetadata);
+			/**封装对象放入{@link AutoConfigurationGroup#autoConfigurationEntries}的属性中*/
 			this.autoConfigurationEntries.add(autoConfigurationEntry);
 			for (String importClassName : autoConfigurationEntry.getConfigurations()) {
 				this.entries.putIfAbsent(importClassName, annotationMetadata);
