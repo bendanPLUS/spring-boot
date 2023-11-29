@@ -99,6 +99,11 @@ public abstract class AutoConfigurationPackages {
 			beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			addBasePackages(beanDefinition, packageNames); //设置项目根包路径 packageNames="smoketest.testng"
 			registry.registerBeanDefinition(BEAN, beanDefinition); //BEAN="org.springframework.boot.autoconfigure.AutoConfigurationPackages"
+			/**
+			 * 根路径使用实例:
+			 * {@link com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration.AutoConfiguredMapperScannerRegistrar#registerBeanDefinitions}
+			 * List<String> packages = AutoConfigurationPackages.get(this.beanFactory);
+			 */
 		}
 	}
 
