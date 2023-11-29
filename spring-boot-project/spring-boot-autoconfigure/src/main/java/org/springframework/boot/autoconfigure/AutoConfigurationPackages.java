@@ -97,8 +97,8 @@ public abstract class AutoConfigurationPackages {
 		else {
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(BasePackages.class);
 			beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			addBasePackages(beanDefinition, packageNames);
-			registry.registerBeanDefinition(BEAN, beanDefinition);
+			addBasePackages(beanDefinition, packageNames); //设置项目根包路径 packageNames="smoketest.testng"
+			registry.registerBeanDefinition(BEAN, beanDefinition); //BEAN="org.springframework.boot.autoconfigure.AutoConfigurationPackages"
 		}
 	}
 

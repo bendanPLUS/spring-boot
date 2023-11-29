@@ -38,7 +38,7 @@ import org.springframework.context.annotation.Import;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import(AutoConfigurationPackages.Registrar.class)
+@Import(AutoConfigurationPackages.Registrar.class) //  设置项目根包路径
 public @interface AutoConfigurationPackage {
 
 	/**
