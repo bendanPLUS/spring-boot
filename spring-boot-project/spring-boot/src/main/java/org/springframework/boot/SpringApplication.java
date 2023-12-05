@@ -264,27 +264,28 @@ public class SpringApplication {
 	 * @see #setSources(Set)
 	 * SPI机制: {@link SpringFactoriesLoader#forResourceLocation(String,ClassLoader); 存入缓存(以后就可以直接从缓存里取):{@link SpringFactoriesLoader#cache}
 	 * @see #getSpringFactoriesInstances(Class<>) 根据类型也就是Key 拿Value -> Lis<T>
+	 *     // 1.设置主启动类(包的位置) 2.web环境(servlet) 3.设置SpringApplication类型初始化器(重写初始化方法) 4.设置SpringApplication类型监听
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"}) //构造器?构造函数?
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
-		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));//设置启动的主类:SampleTestNGApplication
-		this.webApplicationType = WebApplicationType.deduceFromClasspath();//推断Web环境, 基本上就是servlet环境
+		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources)); // 设置启动的主类:SampleTestNGApplication
+		this.webApplicationType = WebApplicationType.deduceFromClasspath(); // 推断Web环境, 基本上就是servlet环境
 		/* !新版本有一些小的改动, 新版本在此处加载META-INF/spring.factories里的key value 并存入缓存!
 		*  预留的一个扩展点
 		*  调用时机: run()->createBootstrapContext()
 		* */
-		this.bootstrapRegistryInitializers = new ArrayList<>(getSpringFactoriesInstances(BootstrapRegistryInitializer.class)); //按照类型拿 实现BootstrapRegistryInitializer接口的
+		this.bootstrapRegistryInitializers = new ArrayList<>(getSpringFactoriesInstances(BootstrapRegistryInitializer.class)); // 按照类型拿 实现BootstrapRegistryInitializer接口的
 		/**
 		 * SpringApplication上下文初始化器
 		 * 特点: 实现{@link ApplicationContextInitializer}接口且重写initialize()方法
 		 * 执行的时机:  刷新IOD容器之前(refreshContext(context))  回调所有实现ApplicationContextInitializer接口的initialize()方法
 		 * 方法: {@link #run(String...)}->prepareContext->applyInitializers->initializer.initialize() {@link #applyInitializers}
 		 */
-		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class)); //set springApplication初始化器
-		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class)); //set springApplication事件监听器
-		this.mainApplicationClass = deduceMainApplicationClass();//确定主启动类 findMainClass 找到方法名为main所在的类
+		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class)); // set springApplication初始化器 SPI
+		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class)); // set springApplication事件监听器 SPI
+		this.mainApplicationClass = deduceMainApplicationClass(); // 确定主启动类 findMainClass 找到方法名为main所在的类
 	}
 
 	private Class<?> deduceMainApplicationClass() {
@@ -1294,6 +1295,11 @@ public class SpringApplication {
 	 * @return the running {@link ApplicationContext}
 	 */
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
+		/*
+		*   手new SpringApplication对象的构造函数所做的事情:     然后再调用静态方法run
+		*	1.设置主启动类(包的位置) 2.web环境(servlet) 3.设置SpringApplication类型初始化器(重写初始化方法) 4.设置SpringApplication类型监听
+		* 	重要:还有一个就是把spring.factory文件下key value形式放入缓存 以便后序的自动化装配获取
+		* */
 		return new SpringApplication(primarySources).run(args); //new SpringApplication 进行了SpringApplication构造函数初始化的过程
 	}
 
