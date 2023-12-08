@@ -44,9 +44,12 @@ public class AutoConfigurationExcludeFilter implements TypeFilter, BeanClassLoad
 		this.beanClassLoader = beanClassLoader;
 	}
 
+
 	@Override
 	public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
 			throws IOException {
+		   /* 约定大于配置 项目中已经有的配置不会重复注册*/
+		// 标注了@Configuration注解 并且 是自动装配的类 被过滤掉
 		return isConfiguration(metadataReader) && isAutoConfiguration(metadataReader);
 	}
 
