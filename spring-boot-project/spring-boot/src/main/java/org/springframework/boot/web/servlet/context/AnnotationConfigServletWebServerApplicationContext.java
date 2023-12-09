@@ -73,7 +73,7 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 *	{@link ApplicationContext #run(String... args) context = createApplicationContext()}
 	 */
 	public AnnotationConfigServletWebServerApplicationContext() {
-		this.reader = new AnnotatedBeanDefinitionReader(this);
+		this.reader = new AnnotatedBeanDefinitionReader(this);  // 此处添加了 ConfigurationClassPostProcessor
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -200,11 +200,14 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		// 1.回调父类(ServletWebServerApplicationContext)方法 @重要
 		super.postProcessBeanFactory(beanFactory);
-		if (this.basePackages != null && this.basePackages.length > 0) {
+		if (this.basePackages != null && this.basePackages.length > 0) { //basePackages一定为空,现实开发中用不到 不在此处扫描
+			// 2.进行组件扫描
 			this.scanner.scan(this.basePackages);
 		}
-		if (!this.annotatedClasses.isEmpty()) {
+		if (!this.annotatedClasses.isEmpty()) { //也为空 现实开发中用不到 不在此处注册
+			// 3.注册解析手动传入的配置类
 			this.reader.register(ClassUtils.toClassArray(this.annotatedClasses));
 		}
 	}

@@ -135,8 +135,14 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 */
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		/**
+		 * 注册ServletContext回调注册器  通过实现ServletContextAware接口实现回调注入功能
+		 * 具体实现在WebApplicationContextServletContextAwareProcessor的父类ServletContextAwareProcessor完成
+		 * {@link ServletContextAwareProcessor#postProcessBeforeInitialization(Object, String)}
+		 */
 		beanFactory.addBeanPostProcessor(new WebApplicationContextServletContextAwareProcessor(this));
 		beanFactory.ignoreDependencyInterface(ServletContextAware.class);
+		// 注册web相关作用域 request session applicationWeb应用的作用域
 		registerWebApplicationScopes();
 	}
 
@@ -248,6 +254,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 
 	private void registerWebApplicationScopes() {
 		ExistingWebApplicationScopes existingScopes = new ExistingWebApplicationScopes(getBeanFactory());
+		// 注册Web默认的作用域
 		WebApplicationContextUtils.registerWebApplicationScopes(getBeanFactory());
 		existingScopes.restore();
 	}
@@ -348,6 +355,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		private static final Set<String> SCOPES;
 
 		static {
+			// 预先初始化两个内置支持的作用域
 			Set<String> scopes = new LinkedHashSet<>();
 			scopes.add(WebApplicationContext.SCOPE_REQUEST);
 			scopes.add(WebApplicationContext.SCOPE_SESSION);
@@ -369,6 +377,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		}
 
 		public void restore() {
+			// 如果前期已经定义了内置作用域, 则此处重新注册
 			this.scopes.forEach((key, value) -> {
 				if (logger.isInfoEnabled()) {
 					logger.info("Restoring user defined scope " + key);

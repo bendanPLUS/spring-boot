@@ -309,36 +309,36 @@ public class SpringApplication {
 		configureHeadlessProperty(); //配置与awt相关的信息
 		//获取监听 并回调starting()方法
 		SpringApplicationRunListeners listeners = getRunListeners(args);
-		listeners.starting(bootstrapContext, this.mainApplicationClass); //初始化+事件的广播
-		try { //准备运行时环境
+		listeners.starting(bootstrapContext, this.mainApplicationClass); // 监听的 回调 初始化+事件的广播
+		try { // 准备运行时环境 environment
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			Banner printedBanner = printBanner(environment); // 打印Banner
 			/* 创建IOC容器->AnnotationConfigServletWebServerApplicationContext 且在构造函数中创建的reader和scanner 尤其是AnnotatedBeanDefinitionReader的创建同时 手动注册了很多 后置处理器的BeanDefinition  (入口:AnnotationConfigUtils.registerAnnotationConfigProcessors 查看)*/
-			context = createApplicationContext(); //1.创建spring应用上下文 applicationContext 比如设置BeanFactory 加载beanFactory的后置处理器:beanFactoryPostProcessors 和 registerBeanDefinition相关内部的 BeanDefinition
+			context = createApplicationContext(); // 1.创建spring应用上下文 applicationContext 比如设置BeanFactory 加载beanFactory的后置处理器:beanFactoryPostProcessors 和 registerBeanDefinition相关内部的 BeanDefinition
 			context.setApplicationStartup(this.applicationStartup);
-			//2.IOC容器的初始化
+			// 2.IOC容器的初始化
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 			/* 刷新IOC容器 至此之前为: applicationContext启动前的准备阶段 */
-			refreshContext(context); //3.spring应用上下文启动阶段 也叫刷新
-			afterRefresh(context, applicationArguments); //4.spring应用上下文启动后阶段 空方法 交给程序员自行扩展
+			refreshContext(context); // 3.spring应用上下文启动阶段 也叫刷新
+			afterRefresh(context, applicationArguments); // 4.spring应用上下文启动后阶段 空方法 交给程序员自行扩展
 			Duration timeTakenToStartup = Duration.ofNanos(System.nanoTime() - startTime);
 			if (this.logStartupInfo) {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), timeTakenToStartup);
 			}
-			listeners.started(context, timeTakenToStartup); //回调
-			callRunners(context, applicationArguments); //回调
+			listeners.started(context, timeTakenToStartup); // 监听的 回调
+			callRunners(context, applicationArguments); // 回调
 		} catch (Throwable ex) {
 			if (ex instanceof AbandonedRunException) {
 				throw ex;
 			}
-			handleRunFailure(context, ex, listeners);
+			handleRunFailure(context, ex, listeners); // 处理运行失败
 			throw new IllegalStateException(ex);
 		}
 		try {
 			if (context.isRunning()) {
 				Duration timeTakenToReady = Duration.ofNanos(System.nanoTime() - startTime);
-				listeners.ready(context, timeTakenToReady); // 回调
+				listeners.ready(context, timeTakenToReady); // 监听的 回调
 			}
 		} catch (Throwable ex) {
 			if (ex instanceof AbandonedRunException) {
@@ -359,14 +359,24 @@ public class SpringApplication {
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners, DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
 		// 根据webApplicationType创建运行时环境 Create and configure the environment
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
-		//配置运行时环境
+		// 配置运行时环境 确定环境类型
+		/* 配合着监听实践广播和时间监听实现的 */
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
-		//监听回调environmentPrepared()方法
+		/* 真正的配置文件加载操作是 配合着监听实践广播和事件监听实现的 dev online test  加载配置文件 application.properties.yml application-dev.properties */
+		// 监听回调environmentPrepared()方法
+		/**
+		 *  配置文件的加载是配合这监听来实现的, so 监听+配置文件的加载+根据webApplicationType创建运行时环境一起学习
+		 * {@link SimpleApplicationEventMulticaster#multicastEvent(ApplicationEvent)}
+		 * {@link SimpleApplicationEventMulticaster#invokeListener(ApplicationListener, ApplicationEvent)}
+		 * {@link org.springframework.boot.context.config.ConfigFileApplicationListener#onApplicationEvent}
+		 * {@link EnvironmentPostProcessorApplicationListener#onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent)}
+		 * {@link ConfigDataEnvironmentPostProcessor#postProcessEnvironment(ConfigurableEnvironment, ResourceLoader, Collection)}
+		 */
 		listeners.environmentPrepared(bootstrapContext, environment);
 		DefaultPropertiesPropertySource.moveToEnd(environment);
 		Assert.state(!environment.containsProperty("spring.main.environment-prefix"), "Environment prefix cannot be set via properties.");
-		bindToSpringApplication(environment);//环境与应用绑定
+		bindToSpringApplication(environment); // 环境与应用绑定
 		if (!this.isCustomEnvironment) {
 			EnvironmentConverter environmentConverter = new EnvironmentConverter(getClassLoader());
 			environment = environmentConverter.convertEnvironmentIfNecessary(environment, deduceEnvironmentClass());
@@ -390,7 +400,7 @@ public class SpringApplication {
 		context.setEnvironment(environment); // 设置配置环境变量
 		postProcessApplicationContext(context); // IOC容器的后置处理器
 		addAotGeneratedInitializerIfNecessary(this.initializers);
-		applyInitializers(context); //遍历执行回调方法initialize()
+		applyInitializers(context); // 遍历执行ApplicationContext初始化器的初始化方法initialize
 		listeners.contextPrepared(context); // spring应用上下文创建+准备完毕时,该方法被回调
 		bootstrapContext.close(context);
 		if (this.logStartupInfo) {
@@ -399,23 +409,24 @@ public class SpringApplication {
 		}
 		// Add boot specific singleton beans
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-		beanFactory.registerSingleton("springApplicationArguments", applicationArguments); // 注册 一些bean
+		// Configurable带有写入(register)的功能
+		beanFactory.registerSingleton("springApplicationArguments", applicationArguments); // 手动注册 一些bean 直接放到了一级缓存里了 , 没有注册beanDefinition
 		if (printedBanner != null) {
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
 		}
 		if (beanFactory instanceof AbstractAutowireCapableBeanFactory autowireCapableBeanFactory) {
-			autowireCapableBeanFactory.setAllowCircularReferences(this.allowCircularReferences);
+			autowireCapableBeanFactory.setAllowCircularReferences(this.allowCircularReferences); // 是否允许循环依赖
 			if (beanFactory instanceof DefaultListableBeanFactory listableBeanFactory) {
 				listableBeanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 			}
 		}
 		if (this.lazyInitialization) {
-			context.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor());
+			context.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor()); // 是否需要延迟初始化 增加一个BeanFactory的后置处理器
 		}
 		context.addBeanFactoryPostProcessor(new PropertySourceOrderingBeanFactoryPostProcessor(context));
 		if (!AotDetector.useGeneratedArtifacts()) {
 			// 获取配置资源(主启动类SampleTestNGApplication) Load the sources
-			Set<Object> sources = getAllSources(); //合并 配置源
+			Set<Object> sources = getAllSources(); // 合并 配置源
 			Assert.notEmpty(sources, "Sources must not be empty");
 			load(context, sources.toArray(new Object[0])); // 将主启动类(SampleTestNGApplication) 封装成BeanDefinition  并注册到BeanDefinitionMap
 		}
@@ -471,7 +482,8 @@ public class SpringApplication {
 		if (this.environment != null) {
 			return this.environment;
 		}
-		ConfigurableEnvironment environment = this.applicationContextFactory.createEnvironment(this.webApplicationType); //根据webApplicationType创建运行时环境
+		// 根据webApplicationType创建运行时环境
+		ConfigurableEnvironment environment = this.applicationContextFactory.createEnvironment(this.webApplicationType);
 		if (environment == null && this.applicationContextFactory != ApplicationContextFactory.DEFAULT) {
 			environment = ApplicationContextFactory.DEFAULT.createEnvironment(this.webApplicationType);
 		}
