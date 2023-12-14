@@ -55,6 +55,7 @@ public class WebServerFactoryCustomizerBeanPostProcessor implements BeanPostProc
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		if (bean instanceof WebServerFactory webServerFactory) {
+			// WebServerFactory 才进行处理
 			postProcessBeforeInitialization(webServerFactory);
 		}
 		return bean;
@@ -69,6 +70,7 @@ public class WebServerFactoryCustomizerBeanPostProcessor implements BeanPostProc
 	private void postProcessBeforeInitialization(WebServerFactory webServerFactory) {
 		LambdaSafe.callbacks(WebServerFactoryCustomizer.class, getCustomizers(), webServerFactory)
 			.withLogger(WebServerFactoryCustomizerBeanPostProcessor.class)
+				// 注意这行customizer.customize
 			.invoke((customizer) -> customizer.customize(webServerFactory));
 	}
 

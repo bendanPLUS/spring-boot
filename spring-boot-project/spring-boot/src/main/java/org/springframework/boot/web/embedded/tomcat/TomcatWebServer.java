@@ -109,17 +109,20 @@ public class TomcatWebServer implements WebServer {
 		synchronized (this.monitor) {
 			try {
 				addInstanceIdToEngineName();
-
+				// 获取第一个可用的context
 				Context context = findContext();
+				// 添加LifecycleListener监听
 				context.addLifecycleListener((event) -> {
 					if (context.equals(event.getSource()) && Lifecycle.START_EVENT.equals(event.getType())) {
 						// Remove service connectors so that protocol binding doesn't
 						// happen when the service is started.
+						// 移除Connectors
 						removeServiceConnectors();
 					}
 				});
 
 				// Start the server to trigger initialization listeners
+				// 启动 tomcat
 				this.tomcat.start();
 
 				// We can re-throw failure exception directly in the main thread
@@ -134,6 +137,7 @@ public class TomcatWebServer implements WebServer {
 
 				// Unlike Jetty, all Tomcat threads are daemon threads. We create a
 				// blocking non-daemon to stop immediate shutdown
+				// 启动Daemon线程 只要有一个非Daemon线程再运行, Daemon线程就不会停止, 整个应用也不会终止 tomcat需要一直运行以接收客户端的请求
 				startDaemonAwaitThread();
 			}
 			catch (Exception ex) {
@@ -190,10 +194,12 @@ public class TomcatWebServer implements WebServer {
 	}
 
 	private void startDaemonAwaitThread() {
+		// 阻止tomcat进程停止运行的线程
 		Thread awaitThread = new Thread("container-" + (containerCounter.get())) {
 
 			@Override
 			public void run() {
+				// 调用await方法,
 				TomcatWebServer.this.tomcat.getServer().await();
 			}
 

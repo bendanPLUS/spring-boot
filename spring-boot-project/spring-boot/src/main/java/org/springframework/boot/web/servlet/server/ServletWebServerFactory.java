@@ -27,7 +27,7 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
  * @since 2.0.0
  * @see WebServer
  */
-@FunctionalInterface
+@FunctionalInterface // 函数式接口
 public interface ServletWebServerFactory extends WebServerFactory {
 
 	/**

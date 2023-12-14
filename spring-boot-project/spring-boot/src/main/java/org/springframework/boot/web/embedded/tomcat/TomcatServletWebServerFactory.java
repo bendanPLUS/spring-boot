@@ -191,22 +191,27 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			Registry.disableRegistry();
 		}
 		Tomcat tomcat = new Tomcat();
+		// 给嵌入式的tomcat创建一个临时文件,用于存放tomcat运行中需要的文件
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
 		for (LifecycleListener listener : this.serverLifecycleListeners) {
 			tomcat.getServer().addLifecycleListener(listener);
 		}
+		// 默认protocol的NIO模式
 		Connector connector = new Connector(this.protocol);
 		connector.setThrowOnFailure(true);
+		// 向Service中添加connector,并执行定制的规则(修改端口号等)
 		tomcat.getService().addConnector(connector);
 		customizeConnector(connector);
 		tomcat.setConnector(connector);
+		// 关闭热部署, 不存在修改web.xml war包等情况
 		tomcat.getHost().setAutoDeploy(false);
 		configureEngine(tomcat.getEngine());
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
 		prepareContext(tomcat.getHost(), initializers);
+		// 创建TomcatWebServer
 		return getTomcatWebServer(tomcat);
 	}
 
@@ -219,6 +224,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
 		File documentRoot = getValidDocumentRoot();
+		// 创建context
 		TomcatEmbeddedContext context = new TomcatEmbeddedContext();
 		if (documentRoot != null) {
 			context.setResources(new LoaderHidingResourceRoot(context));
@@ -254,6 +260,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		}
 		context.addLifecycleListener(new StaticResourceConfigurer(context));
 		ServletContextInitializer[] initializersToUse = mergeInitializers(initializers);
+		// 添加到host中
 		host.addChild(context);
 		configureContext(context, initializersToUse);
 		postProcessContext(context);

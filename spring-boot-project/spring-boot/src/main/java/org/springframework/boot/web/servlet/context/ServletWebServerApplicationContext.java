@@ -164,6 +164,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	protected void onRefresh() {
 		super.onRefresh();
 		try {
+			// 嵌入式Web容器初始化时机
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -184,14 +185,18 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	private void createWebServer() {
 		WebServer webServer = this.webServer;
 		ServletContext servletContext = getServletContext();
+		// 如果webServer 和 servletContext 均为null, 则需要创建嵌入式web容器
 		if (webServer == null && servletContext == null) {
 			StartupStep createWebServer = getApplicationStartup().start("spring.boot.webserver.create");
+			// 先拿工厂 for 创建对象
 			ServletWebServerFactory factory = getWebServerFactory();
 			createWebServer.tag("factory", factory.getClass().toString());
+			// factory创建WebServer
 			this.webServer = factory.getWebServer(getSelfInitializer());
 			createWebServer.end();
 			getBeanFactory().registerSingleton("webServerGracefulShutdown",
 					new WebServerGracefulShutdownLifecycle(this.webServer));
+			// 回调优雅停机的钩子
 			getBeanFactory().registerSingleton("webServerStartStop",
 					new WebServerStartStopLifecycle(this, this.webServer));
 		}
@@ -223,6 +228,15 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 			throw new ApplicationContextException("Unable to start ServletWebServerApplicationContext due to multiple "
 					+ "ServletWebServerFactory beans : " + StringUtils.arrayToCommaDelimitedString(beanNames));
 		}
+		/**
+		 * 扩展点时机:
+		 * {@link org.springframework.boot.web.server.WebServerFactoryCustomizerBeanPostProcessor#postProcessBeforeInitialization(Object, String)}
+		 * {@link org.springframework.boot.web.server.WebServerFactoryCustomizerBeanPostProcessor#postProcessBeforeInitialization(WebServerFactory)}
+		 * {@link AbstractAutowireCapableBeanFactory#initializeBean(String, Object, RootBeanDefinition)}
+		 * {@link AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsBeforeInitialization(Object, String)}
+		 *
+		 */
+		// getBean 这里面利用扩张点来实现 WebServerFactory配置的修改
 		return getBeanFactory().getBean(beanNames[0], ServletWebServerFactory.class);
 	}
 

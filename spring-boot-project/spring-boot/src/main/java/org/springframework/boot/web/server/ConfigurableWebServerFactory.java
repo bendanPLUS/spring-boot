@@ -83,7 +83,7 @@ public interface ConfigurableWebServerFactory extends WebServerFactory, ErrorPag
 	/**
 	 * Sets the shutdown configuration that will be applied to the server.
 	 * @param shutdown the shutdown configuration
-	 * @since 2.3.0
+	 * @since 2.3.0 开启优雅停止设置 预留一些时间给容器的内部程序一些处理时间,再关闭容器
 	 */
 	default void setShutdown(Shutdown shutdown) {
 

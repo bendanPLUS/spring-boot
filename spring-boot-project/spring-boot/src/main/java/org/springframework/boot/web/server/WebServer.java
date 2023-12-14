@@ -25,6 +25,7 @@ package org.springframework.boot.web.server;
  * @author Dave Syer
  * @since 2.0.0
  */
+ /* 顶级接口 启动+停止 动作 */
 public interface WebServer {
 
 	/**
