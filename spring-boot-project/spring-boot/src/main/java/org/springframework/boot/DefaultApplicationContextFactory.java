@@ -44,9 +44,11 @@ class DefaultApplicationContextFactory implements ApplicationContextFactory {
 		return getFromSpringFactories(webApplicationType, ApplicationContextFactory::createEnvironment, null);
 	}
 
+	// 以前都是if操作 现在优化都是用函数式接口来判断是web type 来创建你对于的ioc容器 和 工厂
 	@Override
 	public ConfigurableApplicationContext create(WebApplicationType webApplicationType) {
 		try {
+			//函数式编程:webApplicationType(配对从参数), ApplicationContextFactory::create(调用某个类的某个方法 预之映射)
 			return getFromSpringFactories(webApplicationType, ApplicationContextFactory::create,
 					this::createDefaultApplicationContext);
 		}
@@ -67,11 +69,13 @@ class DefaultApplicationContextFactory implements ApplicationContextFactory {
 			BiFunction<ApplicationContextFactory, WebApplicationType, T> action, Supplier<T> defaultResult) {
 		for (ApplicationContextFactory candidate : SpringFactoriesLoader.loadFactories(ApplicationContextFactory.class,
 				getClass().getClassLoader())) {
+			// BiFunction 函数式编程 ,根据参数中方法 进行匹配
 			T result = action.apply(candidate, webApplicationType);
 			if (result != null) {
 				return result;
 			}
 		}
+		// Supplier 兜底的默认处理
 		return (defaultResult != null) ? defaultResult.get() : null;
 	}
 
