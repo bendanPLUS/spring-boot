@@ -328,6 +328,7 @@ public class SpringApplication {
 			refreshContext(context); // 3.spring应用上下文启动阶段 也叫刷新
 			afterRefresh(context, applicationArguments); // 4.spring应用上下文启动后阶段 空方法 交给程序员自行扩展
 			Duration timeTakenToStartup = Duration.ofNanos(System.nanoTime() - startTime);
+			// 打印启动耗时日志
 			if (this.logStartupInfo) {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), timeTakenToStartup);
 			}
