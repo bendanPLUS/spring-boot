@@ -313,8 +313,9 @@ public class SpringApplication {
 		// 获取监听 并回调starting()方法
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting(bootstrapContext, this.mainApplicationClass); // 监听的 回调 初始化+事件的广播
-		try { // 准备运行时环境 environment
+		try {
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+			// 准备运行时环境 environment
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			Banner printedBanner = printBanner(environment); // 打印Banner
 			/* 创建IOC容器->AnnotationConfigServletWebServerApplicationContext 且在构造函数中创建的reader和scanner 尤其是AnnotatedBeanDefinitionReader的创建同时 手动注册了很多 后置处理器的BeanDefinition  (入口:AnnotationConfigUtils.registerAnnotationConfigProcessors 查看)*/
