@@ -72,7 +72,8 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 * {@linkplain #refresh refreshed}.
 	 *  构造函数时候就 new 了 AnnotatedBeanDefinitionReader 和 ClassPathBeanDefinitionScanner
 	 *	{@link ApplicationContext #run(String... args) context = createApplicationContext()}
-	 *	{@link GenericApplicationContext#GenericApplicationContext()} 设置容器的bean工厂 this.beanFactory=new DefaultListableBeanFactory();
+	 *  设置容器的bean工厂 this.beanFactory=new DefaultListableBeanFactory();
+	 *		{@link GenericApplicationContext#GenericApplicationContext()}
 	 */
 	public AnnotationConfigServletWebServerApplicationContext() {
 		// 此处添加了 ConfigurationClassPostProcessor
