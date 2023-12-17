@@ -47,11 +47,14 @@ import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.boot.Banner.Mode;
+import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
+import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.BindableRuntimeHintsRegistrar;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.boot.convert.ApplicationConversionService;
+import org.springframework.boot.env.EnvironmentPostProcessorApplicationListener;
 import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
@@ -266,7 +269,7 @@ public class SpringApplication {
 	 * @see #getSpringFactoriesInstances(Class<>) 根据类型也就是Key 拿Value -> Lis<T>
 	 *     // 1.设置主启动类(包的位置) 2.web环境(servlet) 3.设置SpringApplication类型初始化器(重写初始化方法) 4.设置SpringApplication类型监听
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"}) //构造器?构造函数?
+	@SuppressWarnings({"unchecked", "rawtypes"}) //构造器?构造函数? (启主类 web应用类型 ioc容器初始化器 监听)
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
@@ -306,8 +309,8 @@ public class SpringApplication {
 		long startTime = System.nanoTime();
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
-		configureHeadlessProperty(); //配置与awt相关的信息
-		//获取监听 并回调starting()方法
+		configureHeadlessProperty(); // 配置与awt相关的信息
+		// 获取监听 并回调starting()方法
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting(bootstrapContext, this.mainApplicationClass); // 监听的 回调 初始化+事件的广播
 		try { // 准备运行时环境 environment
@@ -370,8 +373,9 @@ public class SpringApplication {
 		 * {@link SimpleApplicationEventMulticaster#multicastEvent(ApplicationEvent)}
 		 * {@link SimpleApplicationEventMulticaster#invokeListener(ApplicationListener, ApplicationEvent)}
 		 * {@link org.springframework.boot.context.config.ConfigFileApplicationListener#onApplicationEvent}
-		 * {@link EnvironmentPostProcessorApplicationListener#onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent)}
-		 * {@link ConfigDataEnvironmentPostProcessor#postProcessEnvironment(ConfigurableEnvironment, ResourceLoader, Collection)}
+		 *  监听器: {@link EnvironmentPostProcessorApplicationListener#onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent)}
+		 * 		    监听器onApplicationEnvironmentPreparedEvent方法遍历了所有环境的后置处理器,执行	postProcessEnvironment方法:
+		 * 					最重要的方法 -> {@link ConfigDataEnvironmentPostProcessor#postProcessEnvironment(ConfigurableEnvironment, SpringApplication)}
 		 */
 		listeners.environmentPrepared(bootstrapContext, environment);
 		DefaultPropertiesPropertySource.moveToEnd(environment);
@@ -581,7 +585,10 @@ public class SpringApplication {
 	 * @see #setApplicationContextFactory(ApplicationContextFactory)
 	 */
 	protected ConfigurableApplicationContext createApplicationContext() {
-		//根据webApplicationType创建IOC容器
+		// 根据webApplicationType创建IOC容器是AnnotationConfigServletWebServerApplicationContext 通过创建父类(GenericApplicationContext)时通过构造方法确定了beanfactory为:this.beanFactory = new DefaultListableBeanFactory()
+		// 很重的两点:
+		// 1.确定了DefaultListableBeanFactory为该IOC容器的BeanFactory
+		// 2.确定创建了ConfigurationClassPostProcessor工厂bean后置处理 CommonAnnotationBeanPostProcessor AutowiredAnnotationBeanPostProcessor
 		return this.applicationContextFactory.create(this.webApplicationType);
 	}
 
@@ -1308,7 +1315,7 @@ public class SpringApplication {
 	 */
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
 		/*
-		*   手new SpringApplication对象的构造函数所做的事情:     然后再调用静态方法run
+		*   手new SpringApplication对象的构造函数所做的事情:     然后再调用run方法
 		*	1.设置主启动类(包的位置) 2.web环境(servlet) 3.设置SpringApplication类型初始化器(重写初始化方法) 4.设置SpringApplication类型监听
 		* 	重要:还有一个就是把spring.factory文件下key value形式放入缓存 以便后序的自动化装配获取
 		* */

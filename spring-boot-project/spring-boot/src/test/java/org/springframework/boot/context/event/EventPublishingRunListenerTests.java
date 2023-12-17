@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 
+import com.mysql.cj.callback.MysqlCallbackHandler;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.DefaultBootstrapContext;
@@ -75,12 +76,13 @@ class EventPublishingRunListenerTests {
 		DefaultBootstrapContext bootstrapContext = new DefaultBootstrapContext();
 		ConfigurableEnvironment environment = new StandardEnvironment();
 		TestApplicationListener lateAddedApplicationListener = new TestApplicationListener();
+		//接口泛型 监听 制定监听的具体事件
 		ApplicationListener<ApplicationStartingEvent> listener = (event) -> event.getSpringApplication()
 			.addListeners(lateAddedApplicationListener);
 		application.addListeners(listener);
 		EventPublishingRunListener runListener = new EventPublishingRunListener(application, null);
 		runListener.starting(bootstrapContext);
-		runListener.environmentPrepared(bootstrapContext, environment);
+		runListener.environmentPrepared(bootstrapContext, environment); //multicast广播事件: ApplicationEnvironmentPreparedEvent事件触发 -> invoke监听者的回调方法onApplicationEvent()
 		lateAddedApplicationListener.assertReceivedEvent(ApplicationEnvironmentPreparedEvent.class);
 	}
 
@@ -90,6 +92,8 @@ class EventPublishingRunListenerTests {
 
 		@Override
 		public void onApplicationEvent(ApplicationEvent event) {
+			Object source = event.getSource();
+			System.out.println("++++++++++++++++:" + source.toString());
 			this.events.add(event);
 		}
 

@@ -72,12 +72,14 @@ class EventPublishingRunListener implements SpringApplicationRunListener, Ordere
 
 	@Override
 	public void starting(ConfigurableBootstrapContext bootstrapContext) {
+		// multicast 广播事件: Starting事件
 		multicastInitialEvent(new ApplicationStartingEvent(bootstrapContext, this.application, this.args));
 	}
 
 	@Override
 	public void environmentPrepared(ConfigurableBootstrapContext bootstrapContext,
 									ConfigurableEnvironment environment) {
+		// multicast 广播事件: EnvironmentPrepared事件
 		multicastInitialEvent(
 				new ApplicationEnvironmentPreparedEvent(bootstrapContext, this.application, this.args, environment));
 	}
@@ -136,6 +138,7 @@ class EventPublishingRunListener implements SpringApplicationRunListener, Ordere
 	 */
 	private void multicastInitialEvent(ApplicationEvent event) {
 		refreshApplicationListeners();
+		// 根据事件的类型拿去监听某类型的所有监听器,执行监听器统一的listener.onApplicationEvent(event), onApplicationEvent里再根据事件的类型进行匹配相应的方法
 		this.initialMulticaster.multicastEvent(event); // 进行事件的广播
 	}
 
