@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -32,6 +33,7 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.context.annotation.ScopeMetadataResolver;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -74,6 +76,9 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 *	{@link ApplicationContext #run(String... args) context = createApplicationContext()}
 	 *  设置容器的bean工厂 this.beanFactory=new DefaultListableBeanFactory();
 	 *		{@link GenericApplicationContext#GenericApplicationContext()}
+	 * 	两个比较重要的后置处理器,注册的时机:	 CommonAnnotationBeanPostProcessor 和 AutowiredAnnotationBeanPostProcessor
+	 * 		{@link AnnotatedBeanDefinitionReader#AnnotatedBeanDefinitionReader(BeanDefinitionRegistry, Environment)}
+	 *   	{@link AnnotationConfigUtils#registerAnnotationConfigProcessors(BeanDefinitionRegistry, Object)}
 	 */
 	public AnnotationConfigServletWebServerApplicationContext() {
 		// 此处添加了 ConfigurationClassPostProcessor
