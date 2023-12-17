@@ -90,15 +90,18 @@ public abstract class AutoConfigurationPackages {
 	 * @param registry the bean definition registry
 	 * @param packageNames the package names to set
 	 */
+	// 将启动类所在的包路径 注册成beanDefinition 供其他模块使用 key=org.springframework.boot.autoconfigure.AutoConfigurationPackages
 	public static void register(BeanDefinitionRegistry registry, String... packageNames) {
+		// 如果进行了配置?
 		if (registry.containsBeanDefinition(BEAN)) {
 			addBasePackages(registry.getBeanDefinition(BEAN), packageNames);
 		}
 		else {
+			// 约定 默认
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(BasePackages.class);
 			beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			addBasePackages(beanDefinition, packageNames); //设置项目根包路径 packageNames="smoketest.testng"
-			registry.registerBeanDefinition(BEAN, beanDefinition); //BEAN="org.springframework.boot.autoconfigure.AutoConfigurationPackages"
+			addBasePackages(beanDefinition, packageNames); // 设置项目根包路径 packageNames="smoketest.testng"
+			registry.registerBeanDefinition(BEAN, beanDefinition); // BEAN="org.springframework.boot.autoconfigure.AutoConfigurationPackages"
 			/**
 			 * 根路径使用实例:
 			 * {@link com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration.AutoConfiguredMapperScannerRegistrar#registerBeanDefinitions}
@@ -151,9 +154,11 @@ public abstract class AutoConfigurationPackages {
 			AnnotationAttributes attributes = AnnotationAttributes
 				.fromMap(metadata.getAnnotationAttributes(AutoConfigurationPackage.class.getName(), false));
 			List<String> packageNames = new ArrayList<>(Arrays.asList(attributes.getStringArray("basePackages")));
+			// 注解上是否配置了 包路径?
 			for (Class<?> basePackageClass : attributes.getClassArray("basePackageClasses")) {
 				packageNames.add(basePackageClass.getPackage().getName());
 			}
+			// 如果没设置 则设置默认的启动类所在的包路径 约定大于配置
 			if (packageNames.isEmpty()) {
 				packageNames.add(ClassUtils.getPackageName(metadata.getClassName()));
 			}

@@ -73,6 +73,9 @@ import org.springframework.util.StringUtils;
  * @since 1.3.0
  * @see EnableAutoConfiguration
  */
+ /*         自动化装配的设计:基于约定大于配置,
+        项目中已经有的配置不会重复注册,项目中没有的配置将予以补充,
+        负责补充的任务就交给AutoConfigurationImportSelector实现 */
 public class AutoConfigurationImportSelector implements DeferredImportSelector, BeanClassLoaderAware,
 		ResourceLoaderAware, BeanFactoryAware, EnvironmentAware, Ordered {
 
@@ -99,7 +102,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		if (!isEnabled(annotationMetadata)) {
 			return NO_IMPORTS;
 		}
-		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata);//加载 META-INF/spring 下的AutoConfiguration bean
+		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata); // 加载 META-INF/spring 下的AutoConfiguration bean
 		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
 	}
 
@@ -122,15 +125,19 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		if (!isEnabled(annotationMetadata)) {
 			return EMPTY_ENTRY;
 		}
+		// 加载注解属性配置
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
-		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);//获取所有需要自动装配的AutoConfiguration Candidate候选
-		configurations = removeDuplicates(configurations); //去重
+		// 获取所有需要自动装配的AutoConfiguration Candidate候选
+		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+		configurations = removeDuplicates(configurations); // 自动配置类去重
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
-		checkExcludedClasses(configurations, exclusions); //去除排除的
+		checkExcludedClasses(configurations, exclusions); // 获取显示配置Excluded要移除的配置类
+		// 移除
 		configurations.removeAll(exclusions);
 		configurations = getConfigurationClassFilter().filter(configurations);
+		// 广播事件
 		fireAutoConfigurationImportEvents(configurations, exclusions);
-		return new AutoConfigurationEntry(configurations, exclusions); //封装成对象(数据存放在list configurations属性中)
+		return new AutoConfigurationEntry(configurations, exclusions); // 封装成对象(数据存放在list configurations属性中)
 	}
 
 	/**
@@ -182,6 +189,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @return a list of candidate configurations
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+		// SPI 机制
 		List<String> configurations = ImportCandidates.load(AutoConfiguration.class, getBeanClassLoader()) //JDK17 不放在spring.factories 是单独的目录:META-INF/spring
 			.getCandidates();
 		Assert.notEmpty(configurations,
