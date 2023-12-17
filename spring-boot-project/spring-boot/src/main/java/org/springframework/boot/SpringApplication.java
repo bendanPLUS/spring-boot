@@ -439,6 +439,7 @@ public class SpringApplication {
 			// 获取配置资源(主启动类SampleTestNGApplication) Load the sources
 			Set<Object> sources = getAllSources(); // 合并 配置源
 			Assert.notEmpty(sources, "Sources must not be empty");
+			// 加载资源配置
 			load(context, sources.toArray(new Object[0])); // 将主启动类(SampleTestNGApplication) 封装成BeanDefinition  并注册到BeanDefinitionMap
 		}
 		listeners.contextLoaded(context); // 事件监听回调 执行SpringApplicationRunListeners方法回调
@@ -703,6 +704,7 @@ public class SpringApplication {
 		if (this.environment != null) {
 			loader.setEnvironment(this.environment);
 		}
+		// 外观模式: 利用BeanDefinitionLoader作为一个统一的入口,针对传入多个配置源选择不同的处理逻辑, 使用适合的组件进行处理
 		loader.load();
 	}
 

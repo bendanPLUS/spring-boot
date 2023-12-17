@@ -125,6 +125,7 @@ class BeanDefinitionLoader {
 	 * Load the sources into the reader.
 	 */
 	void load() {
+		// 多个配置源 处理的逻辑不通过
 		for (Object source : this.sources) {
 			load(source);
 		}
@@ -132,6 +133,7 @@ class BeanDefinitionLoader {
 
 	private void load(Object source) {
 		Assert.notNull(source, "Source must not be null");
+		// 根据不同配置源 进行处理的逻辑也不相同
 		if (source instanceof Class<?> clazz) {
 			load(clazz);
 			return;
