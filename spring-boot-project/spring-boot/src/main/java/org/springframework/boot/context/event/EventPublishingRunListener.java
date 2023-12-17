@@ -35,6 +35,7 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.Ordered;
+import org.springframework.core.ResolvableType;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.ErrorHandler;
 
@@ -138,6 +139,10 @@ class EventPublishingRunListener implements SpringApplicationRunListener, Ordere
 	 */
 	private void multicastInitialEvent(ApplicationEvent event) {
 		refreshApplicationListeners();
+		/**
+		 *  事件广播器(SimpleApplicationEventMulticaster) 广播事件(multicastEvent):
+		 *  {@link SimpleApplicationEventMulticaster#multicastEvent(ApplicationEvent, ResolvableType)}
+		 */
 		// 根据事件的类型拿去监听某类型的所有监听器,执行监听器统一的listener.onApplicationEvent(event), onApplicationEvent里再根据事件的类型进行匹配相应的方法
 		this.initialMulticaster.multicastEvent(event); // 进行事件的广播
 	}
