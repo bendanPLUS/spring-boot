@@ -316,7 +316,7 @@ public class SpringApplication {
 		try {
 			// 将main方法的args参数封装到一个对象中
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
-			// 准备运行时环境 environment
+			// 1. 准备运行时环境 environment
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			Banner printedBanner = printBanner(environment); // 打印Banner
 			/* 创建空的IOC容器->AnnotationConfigServletWebServerApplicationContext 且在构造函数中创建的reader和scanner 尤其是AnnotatedBeanDefinitionReader的创建同时 手动注册了很多 后置处理器的BeanDefinition  (入口:AnnotationConfigUtils.registerAnnotationConfigProcessors 查看)*/
@@ -405,8 +405,13 @@ public class SpringApplication {
 	private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context, ConfigurableEnvironment environment, SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
 		context.setEnvironment(environment); // 设置配置环境变量
 		postProcessApplicationContext(context); // IOC容器的后置处理器
+		/**
+		 * 添加初始化器 并执行初始化方法initialize()
+		 * 通过spi机制获取到所有的初始化器
+		 * 		{@link SpringApplication#SpringApplication(ResourceLoader, Class[])}
+		 */
 		addAotGeneratedInitializerIfNecessary(this.initializers);
-		applyInitializers(context); // 遍历执行ApplicationContext初始化器的初始化方法initialize
+		applyInitializers(context);
 		listeners.contextPrepared(context); // spring应用上下文创建+准备完毕时,该方法被回调
 		bootstrapContext.close(context);
 		if (this.logStartupInfo) {
