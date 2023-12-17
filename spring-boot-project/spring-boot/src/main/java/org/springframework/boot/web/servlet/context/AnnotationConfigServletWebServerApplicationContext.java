@@ -30,6 +30,7 @@ import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.annotation.AnnotationScopeMetadataResolver;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.context.annotation.ScopeMetadataResolver;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -71,9 +72,11 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 * {@linkplain #refresh refreshed}.
 	 *  构造函数时候就 new 了 AnnotatedBeanDefinitionReader 和 ClassPathBeanDefinitionScanner
 	 *	{@link ApplicationContext #run(String... args) context = createApplicationContext()}
+	 *	{@link GenericApplicationContext#GenericApplicationContext()} 设置容器的bean工厂 this.beanFactory=new DefaultListableBeanFactory();
 	 */
 	public AnnotationConfigServletWebServerApplicationContext() {
-		this.reader = new AnnotatedBeanDefinitionReader(this);  // 此处添加了 ConfigurationClassPostProcessor
+		// 此处添加了 ConfigurationClassPostProcessor
+		this.reader = new AnnotatedBeanDefinitionReader(this);
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
