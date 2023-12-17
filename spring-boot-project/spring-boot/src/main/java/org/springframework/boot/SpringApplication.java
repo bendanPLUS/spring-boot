@@ -314,6 +314,7 @@ public class SpringApplication {
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting(bootstrapContext, this.mainApplicationClass); // 监听的 回调 初始化+事件的广播
 		try {
+			// 将main方法的args参数封装到一个对象中
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 			// 准备运行时环境 environment
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
