@@ -144,6 +144,8 @@ import org.springframework.web.util.UrlPathHelper;
 		ValidationAutoConfiguration.class })
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnClass({ Servlet.class, DispatcherServlet.class, WebMvcConfigurer.class })
+/* 体现约定大于配置 P43 如果实现了WebMvcConfigurationSupport的类,就使用自定义的配置*/
+//当IOC容器没有实现WebMvcConfigurationSupport接口的类,才进行实例化WebMvcAutoConfiguration Bean
 @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
 @ImportRuntimeHints(WebResourcesRuntimeHints.class)
