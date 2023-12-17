@@ -319,7 +319,7 @@ public class SpringApplication {
 			// 准备运行时环境 environment
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			Banner printedBanner = printBanner(environment); // 打印Banner
-			/* 创建IOC容器->AnnotationConfigServletWebServerApplicationContext 且在构造函数中创建的reader和scanner 尤其是AnnotatedBeanDefinitionReader的创建同时 手动注册了很多 后置处理器的BeanDefinition  (入口:AnnotationConfigUtils.registerAnnotationConfigProcessors 查看)*/
+			/* 创建空的IOC容器->AnnotationConfigServletWebServerApplicationContext 且在构造函数中创建的reader和scanner 尤其是AnnotatedBeanDefinitionReader的创建同时 手动注册了很多 后置处理器的BeanDefinition  (入口:AnnotationConfigUtils.registerAnnotationConfigProcessors 查看)*/
 			context = createApplicationContext(); // 1.创建spring应用上下文 applicationContext 比如设置BeanFactory 加载beanFactory的后置处理器:beanFactoryPostProcessors 和 registerBeanDefinition相关内部的 BeanDefinition
 			context.setApplicationStartup(this.applicationStartup);
 			// 2.IOC容器的初始化
