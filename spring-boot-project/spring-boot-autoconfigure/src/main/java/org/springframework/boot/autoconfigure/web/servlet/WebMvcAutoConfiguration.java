@@ -140,9 +140,12 @@ import org.springframework.web.util.UrlPathHelper;
  * @author Scott Frederick
  * @since 2.0.0
  */
+// WebMvcAutoConfiguration初始化要在 DispatcherServletAutoConfiguration TaskExecutionAutoConfiguration ValidationAutoConfiguration之后
 @AutoConfiguration(after = { DispatcherServletAutoConfiguration.class, TaskExecutionAutoConfiguration.class,
 		ValidationAutoConfiguration.class })
+// 当前必须是servlet环境
 @ConditionalOnWebApplication(type = Type.SERVLET)
+// 必须存在 Servlet DispatcherServlet WebMvcConfigurer
 @ConditionalOnClass({ Servlet.class, DispatcherServlet.class, WebMvcConfigurer.class })
 /* 体现约定大于配置 P43 如果实现了WebMvcConfigurationSupport的类,就使用自定义的配置*/
 //当IOC容器没有实现WebMvcConfigurationSupport接口的类,才进行实例化WebMvcAutoConfiguration Bean

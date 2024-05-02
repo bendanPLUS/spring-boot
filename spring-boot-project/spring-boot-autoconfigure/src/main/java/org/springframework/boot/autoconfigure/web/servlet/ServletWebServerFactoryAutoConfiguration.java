@@ -68,6 +68,7 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 		ServletWebServerFactoryConfiguration.EmbeddedTomcat.class,
 		ServletWebServerFactoryConfiguration.EmbeddedJetty.class,
 		ServletWebServerFactoryConfiguration.EmbeddedUndertow.class })
+// 真正使用哪个容器 是有这几个Embedded容器决定的
 public class ServletWebServerFactoryAutoConfiguration {
 
 	@Bean
