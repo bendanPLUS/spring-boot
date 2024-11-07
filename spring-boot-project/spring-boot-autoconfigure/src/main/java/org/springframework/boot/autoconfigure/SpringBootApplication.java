@@ -46,16 +46,16 @@ import org.springframework.data.repository.Repository;
  * @author Phillip Webb
  * @author Stephane Nicoll
  * @author Andy Wilkinson
- * @since 1.2.0
+ * @since 1.2.0   Spring Boot的自动自动装配实际就是模块装配+条件装配+spi机制的组合使用，而这一切都凝聚在SpringBoot主启动类的@SpringBootApplication注解上，@SpringBootApplication注解是由三个注解组合而来的复合注解，只要在主启动类上标注@SpringBootApplication注解，就会触发组件的自动装配@EnableAutoConfiguration和组件的组件扫描@ComponentScan
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@SpringBootConfiguration
-@EnableAutoConfiguration
+@SpringBootConfiguration // 注解配置类
+@EnableAutoConfiguration // 自动装配
 @ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
-		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) }) // 组件扫描
 public @interface SpringBootApplication {
 
 	/**
