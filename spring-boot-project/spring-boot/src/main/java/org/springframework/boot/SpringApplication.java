@@ -253,6 +253,7 @@ public class SpringApplication {
 	 * @see #setSources(Set)
 	 */
 	public SpringApplication(Class<?>... primarySources) {
+		// 静态run方法调用的springapplication构造方法中只传入了primarySources
 		this(null, primarySources);
 	}
 
@@ -269,7 +270,7 @@ public class SpringApplication {
 	 * @see #getSpringFactoriesInstances(Class<>) 根据类型也就是Key 拿Value -> Lis<T>
 	 *     // 1.设置主启动类(包的位置) 2.web环境(servlet) 3.设置SpringApplication类型初始化器(重写初始化方法) 4.设置SpringApplication类型监听
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"}) //构造器?构造函数? (启主类 web应用类型 ioc容器初始化器 监听)
+	@SuppressWarnings({"unchecked", "rawtypes"}) // SpringApplication的构造函数 (设置启主类 web应用类型 ioc容器初始化器 监听)
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
@@ -286,9 +287,9 @@ public class SpringApplication {
 		 * 执行的时机:  刷新IOD容器之前(refreshContext(context))  回调所有实现ApplicationContextInitializer接口的initialize()方法
 		 * 方法: {@link #run(String...)}->prepareContext->applyInitializers->initializer.initialize() {@link #applyInitializers}
 		 */
-		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class)); // set springApplication初始化器 SPI
-		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class)); // set springApplication事件监听器 SPI
-		this.mainApplicationClass = deduceMainApplicationClass(); // 确定主启动类 findMainClass 找到方法名为main所在的类
+		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class)); // 1. set springApplication初始化器 SPI
+		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class)); // 2. set springApplication事件监听器 SPI
+		this.mainApplicationClass = deduceMainApplicationClass(); // 3. 确定主启动类 findMainClass 找到方法名为main所在的类
 	}
 
 	private Class<?> deduceMainApplicationClass() {
@@ -309,8 +310,8 @@ public class SpringApplication {
 		long startTime = System.nanoTime();
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
-		configureHeadlessProperty(); // 配置与awt相关的信息
-		// 获取监听 并回调starting()方法
+		configureHeadlessProperty(); // 配置与awt相关的信息 即使没有检测到显示器，也允许继续启动
+		// 获取一组SpringApplicationRunListener 监听 并回调starting()方法
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting(bootstrapContext, this.mainApplicationClass); // 监听的 回调 初始化+事件的广播
 		try {
@@ -410,6 +411,8 @@ public class SpringApplication {
 		 * 添加初始化器 并执行初始化方法initialize()
 		 * 通过spi机制获取到所有的初始化器
 		 * 		{@link SpringApplication#SpringApplication(ResourceLoader, Class[])}
+		 * 			setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class)); // 1. set springApplication初始化器 SPI
+		 * 		    依次执行ApplicationContextInitializer的回调initialize方法
 		 */
 		addAotGeneratedInitializerIfNecessary(this.initializers);
 		applyInitializers(context);
@@ -465,6 +468,7 @@ public class SpringApplication {
 		refresh(context);
 	}
 
+	// p131
 	private void configureHeadlessProperty() {
 		// 类似于getOrDefault 没有就设置null 没使用 判断有没有显示器
 		System.setProperty(SYSTEM_PROPERTY_JAVA_AWT_HEADLESS, System.getProperty(SYSTEM_PROPERTY_JAVA_AWT_HEADLESS, Boolean.toString(this.headless)));
