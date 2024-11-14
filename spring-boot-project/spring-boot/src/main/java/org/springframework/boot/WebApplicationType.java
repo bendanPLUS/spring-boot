@@ -60,15 +60,15 @@ public enum WebApplicationType {
 	static WebApplicationType deduceFromClasspath() {
 		if (ClassUtils.isPresent(WEBFLUX_INDICATOR_CLASS, null)
 				&& !ClassUtils.isPresent(WEBMVC_INDICATOR_CLASS, null)
-				&& !ClassUtils.isPresent(JERSEY_INDICATOR_CLASS, null)) {
+				&& !ClassUtils.isPresent(JERSEY_INDICATOR_CLASS, null)) { // 存在reactive.DispatcherHandler 并且不存在servlet.DispatcherServlet和servlet.ServletContainer 则启动REACTIVE
 			return WebApplicationType.REACTIVE;
 		}
 		for (String className : SERVLET_INDICATOR_CLASSES) {
-			if (!ClassUtils.isPresent(className, null)) {
+			if (!ClassUtils.isPresent(className, null)) { // 如果Servlet和ConfigurableWebApplicationContext有一个不存在， 则启动NONE环境
 				return WebApplicationType.NONE;
 			}
 		}
-		return WebApplicationType.SERVLET;
+		return WebApplicationType.SERVLET; // 否则启动servlet
 	}
 
 	static class WebApplicationTypeRuntimeHints implements RuntimeHintsRegistrar {
