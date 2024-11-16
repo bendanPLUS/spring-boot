@@ -54,11 +54,11 @@ import org.springframework.util.ErrorHandler;
  */
 class EventPublishingRunListener implements SpringApplicationRunListener, Ordered {
 
-	private final SpringApplication application;
+	private final SpringApplication application; // 需要拿到SpringApplication里的所有listeners  getListeners();
 
 	private final String[] args;
 
-	private final SimpleApplicationEventMulticaster initialMulticaster;
+	private final SimpleApplicationEventMulticaster initialMulticaster; // 事件广播器
 
 	EventPublishingRunListener(SpringApplication application, String[] args) {
 		this.application = application;
