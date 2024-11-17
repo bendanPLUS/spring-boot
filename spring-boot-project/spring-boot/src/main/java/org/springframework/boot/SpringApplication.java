@@ -376,7 +376,7 @@ public class SpringApplication {
 		 *  配置文件的加载是配合这监听来实现的, so 监听+配置文件的加载+根据webApplicationType创建运行时环境一起学习
 		 * {@link SimpleApplicationEventMulticaster#multicastEvent(ApplicationEvent)}
 		 * {@link SimpleApplicationEventMulticaster#invokeListener(ApplicationListener, ApplicationEvent)}
-		 * {@link org.springframework.boot.context.config.ConfigFileApplicationListener#onApplicationEvent}
+		 * {@link org.springframework.boot.context.config.ConfigFileApplicationListener#onApplicationEvent}  //ConfigFileApplicationListener在Spring Boot 2.4.0版本中被移除，取而代之的是EnvironmentPostProcessor
 		 *  监听器: {@link EnvironmentPostProcessorApplicationListener#onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent)}
 		 * 		    监听器onApplicationEnvironmentPreparedEvent方法遍历了所有环境的后置处理器,执行	postProcessEnvironment方法:
 		 * 					最重要的方法 -> {@link ConfigDataEnvironmentPostProcessor#postProcessEnvironment(ConfigurableEnvironment, SpringApplication)}
