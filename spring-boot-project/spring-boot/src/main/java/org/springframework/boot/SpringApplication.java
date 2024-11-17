@@ -415,7 +415,7 @@ public class SpringApplication {
 		 * 		    依次执行ApplicationContextInitializer的回调initialize方法
 		 */
 		addAotGeneratedInitializerIfNecessary(this.initializers);
-		applyInitializers(context);
+		applyInitializers(context); // 执行ApplicationContextInitializer的.initialize(context)方法
 		listeners.contextPrepared(context); // spring应用上下文创建+准备完毕时,该方法被回调
 		bootstrapContext.close(context);
 		if (this.logStartupInfo) {
@@ -596,6 +596,7 @@ public class SpringApplication {
 	 * falling back to a suitable default.
 	 * @return the application context (not yet refreshed)
 	 * @see #setApplicationContextFactory(ApplicationContextFactory)
+	 * {@link org.springframework.boot.web.servlet.context.ServletWebServerApplicationContextFactory#create(WebApplicationType)}  -> createContext() -> new AnnotationConfigServletWebServerApplicationContext()
 	 */
 	protected ConfigurableApplicationContext createApplicationContext() {
 		// 根据webApplicationType创建IOC容器是AnnotationConfigServletWebServerApplicationContext 通过创建父类(GenericApplicationContext)时通过构造方法确定了beanfactory为:this.beanFactory = new DefaultListableBeanFactory()
@@ -614,7 +615,7 @@ public class SpringApplication {
 		if (this.beanNameGenerator != null) {
 			//单例注册一个 internalConfigurationBeanNameGenerator bean名称生成器(beanNameGenerator)
 			context.getBeanFactory().registerSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR, this.beanNameGenerator);
-		}
+		} // 默认情况下， 此处this.resourceLoader==null
 		if (this.resourceLoader != null) {
 			if (context instanceof GenericApplicationContext genericApplicationContext) {
 				genericApplicationContext.setResourceLoader(this.resourceLoader); // 资源加载器
@@ -623,7 +624,7 @@ public class SpringApplication {
 				defaultResourceLoader.setClassLoader(this.resourceLoader.getClassLoader()); // 类加载器
 			}
 		}
-		if (this.addConversionService) {
+		if (this.addConversionService) { // this.addConversionService==true
 			context.getBeanFactory().setConversionService(context.getEnvironment().getConversionService()); // 设置类型转换器
 		}
 	}

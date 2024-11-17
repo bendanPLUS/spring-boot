@@ -34,9 +34,9 @@ import org.springframework.util.Assert;
  * @since 2.4.0
  */
 public class DefaultBootstrapContext implements ConfigurableBootstrapContext {
-
+	// 对象创建器
 	private final Map<Class<?>, InstanceSupplier<?>> instanceSuppliers = new HashMap<>();
-
+	// 对象
 	private final Map<Class<?>, Object> instances = new HashMap<>();
 
 	private final ApplicationEventMulticaster events = new SimpleApplicationEventMulticaster();
