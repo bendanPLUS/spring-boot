@@ -369,7 +369,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		private static final Set<String> SCOPES;
 
 		static {
-			// 预先初始化两个内置支持的作用域
+			// 预先初始化两个内置支持的作用域 request session
 			Set<String> scopes = new LinkedHashSet<>();
 			scopes.add(WebApplicationContext.SCOPE_REQUEST);
 			scopes.add(WebApplicationContext.SCOPE_SESSION);
