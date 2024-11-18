@@ -212,13 +212,12 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 		// 1.回调父类(ServletWebServerApplicationContext)方法 @重要
 		super.postProcessBeanFactory(beanFactory);
 		if (this.basePackages != null && this.basePackages.length > 0) { //basePackages一定为空,现实开发中用不到 不在此处扫描
-			// 2.进行组件扫描
+			// 2.进行组件扫描 启动时不会执行
 			this.scanner.scan(this.basePackages);
 		}
 		if (!this.annotatedClasses.isEmpty()) { //也为空 现实开发中用不到 不在此处注册
-			// 3.注册解析手动传入的配置类
+			// 3.注册解析手动传入的配置类 启动时不会执行
 			this.reader.register(ClassUtils.toClassArray(this.annotatedClasses));
 		}
 	}
-
 }
