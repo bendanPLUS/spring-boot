@@ -287,8 +287,8 @@ public class SpringApplication {
 		 * 执行的时机:  刷新IOD容器之前(refreshContext(context))  回调所有实现ApplicationContextInitializer接口的initialize()方法
 		 * 方法: {@link #run(String...)}->prepareContext->applyInitializers->initializer.initialize() {@link #applyInitializers}
 		 */
-		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class)); // 1. set springApplication初始化器 SPI
-		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class)); // 2. set springApplication事件监听器 SPI
+		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class)); // 1. set springApplication初始化器s SPI
+		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class)); // 2. set springApplication事件监听器s SPI
 		this.mainApplicationClass = deduceMainApplicationClass(); // 3. 确定主启动类 findMainClass 找到方法名为main所在的类
 	}
 
