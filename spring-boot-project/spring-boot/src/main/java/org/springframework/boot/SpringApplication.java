@@ -311,7 +311,7 @@ public class SpringApplication {
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
 		configureHeadlessProperty(); // 配置与awt相关的信息 即使没有检测到显示器，也允许继续启动
-		// 获取一组SpringApplicationRunListener 监听 并回调starting()方法
+		// 获取一组SpringApplicationRunListener 监听 并回调starting()方法  /springframework/boot/spring-boot/2.2.5.RELEASE/spring-boot-2.2.5.RELEASE.jar!/META-INF/spring.factories org.springframework.boot.SpringApplicationRunListener=org.springframework.boot.context.event.EventPublishingRunListener
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting(bootstrapContext, this.mainApplicationClass); // 监听的 回调 初始化+事件的广播
 		try {
