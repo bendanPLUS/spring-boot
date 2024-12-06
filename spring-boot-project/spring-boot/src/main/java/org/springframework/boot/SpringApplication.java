@@ -283,6 +283,7 @@ public class SpringApplication {
 		* */
 		this.bootstrapRegistryInitializers = new ArrayList<>(getSpringFactoriesInstances(BootstrapRegistryInitializer.class)); // 按照类型拿 实现BootstrapRegistryInitializer接口的
 		/**
+		 * 通过SPI机制设置Application的初始化器和监听器
 		 * SpringApplication上下文初始化器
 		 * 特点: 实现{@link ApplicationContextInitializer}接口且重写initialize()方法
 		 * 执行的时机:  刷新IOD容器之前(refreshContext(context))  回调所有实现ApplicationContextInitializer接口的initialize()方法
