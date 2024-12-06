@@ -253,7 +253,7 @@ public class SpringApplication {
 	 * @see #setSources(Set)
 	 */
 	public SpringApplication(Class<?>... primarySources) {
-		// 静态run方法调用的springapplication构造方法中只传入了primarySources
+		// 静态run方法调用的springApplication构造方法中只传入了primarySources
 		this(null, primarySources);
 	}
 
@@ -266,9 +266,10 @@ public class SpringApplication {
 	 * @param primarySources the primary bean sources
 	 * @see #run(Class, String[])
 	 * @see #setSources(Set)
-	 * SPI机制: {@link SpringFactoriesLoader#forResourceLocation(String,ClassLoader); 存入缓存(以后就可以直接从缓存里取):{@link SpringFactoriesLoader#cache}
-	 * @see #getSpringFactoriesInstances(Class<>) 根据类型也就是Key 拿Value -> Lis<T>
+	 *
+	 * @see #getSpringFactoriesInstances(Class) 根据类型也就是Key 拿Value -> Lis<T>
 	 *     // 1.设置主启动类(包的位置) 2.web环境(servlet) 3.设置SpringApplication类型初始化器(重写初始化方法) 4.设置SpringApplication类型监听
+	 * SPI机制: 详情在getSpringFactoriesInstances方法 {@link SpringFactoriesLoader#forResourceLocation(String,ClassLoader); 存入缓存(以后就可以直接从缓存里取):{@link SpringFactoriesLoader#cache}
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"}) // SpringApplication的构造函数 (设置启主类 web应用类型 ioc容器初始化器 监听)
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
@@ -1332,7 +1333,7 @@ public class SpringApplication {
 		/*
 		*   手new SpringApplication对象的构造函数所做的事情:     然后再调用run方法
 		*	1.设置主启动类(包的位置) 2.web环境(servlet) 3.设置SpringApplication类型初始化器(重写初始化方法) 4.设置SpringApplication类型监听
-		* 	重要:还有一个就是把spring.factory文件下key value形式放入缓存 以便后序的自动化装配获取 org.springframework.core.io.support.SpringFactoriesLoader#loadSpringFactories
+		* 	重要:还有一个就是把spring.factory文件下key value形式放入缓存 以便后序的自动化装配获取 org.springframework.core.io.support.SpringFactoriesLoader#loadSpringFactories org.springframework.core.io.support.SpringFactoriesLoader.cache
 		* */
 		return new SpringApplication(primarySources).run(args); //new SpringApplication 进行了SpringApplication构造函数初始化的过程
 	}
