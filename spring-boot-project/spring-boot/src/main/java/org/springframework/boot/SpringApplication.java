@@ -253,7 +253,7 @@ public class SpringApplication {
 	 * @see #setSources(Set)
 	 */
 	public SpringApplication(Class<?>... primarySources) {
-		// 静态run方法调用的springApplication构造方法中只传入了primarySources
+		// 静态run方法调用的springApplication构造方法中只传入了primarySources ， ResourceLoader写死为null
 		this(null, primarySources);
 	}
 
