@@ -446,11 +446,11 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 					() -> String.format("Only %s implementations are supported, got %s",
 							AutoConfigurationImportSelector.class.getSimpleName(),
 							deferredImportSelector.getClass().getName()));
-			/**拿到自动化装配的所有配置类放入对象:{@link AutoConfigurationEntry#configurations}的属性中*/
-			//String[] strings = deferredImportSelector.selectImports(annotationMetadata);
+			/* 拿到自动化装配的所有配置类放入对象:{@link AutoConfigurationEntry#configurations}的属性中 */
+			// String[] strings = deferredImportSelector.selectImports(annotationMetadata);
 			AutoConfigurationEntry autoConfigurationEntry = ((AutoConfigurationImportSelector) deferredImportSelector)
 				.getAutoConfigurationEntry(annotationMetadata);
-			/**封装对象放入{@link AutoConfigurationGroup#autoConfigurationEntries}的属性中*/
+			/* 封装对象放入{@link AutoConfigurationGroup#autoConfigurationEntries}的属性中 */
 			this.autoConfigurationEntries.add(autoConfigurationEntry);
 			for (String importClassName : autoConfigurationEntry.getConfigurations()) {
 				this.entries.putIfAbsent(importClassName, annotationMetadata);
