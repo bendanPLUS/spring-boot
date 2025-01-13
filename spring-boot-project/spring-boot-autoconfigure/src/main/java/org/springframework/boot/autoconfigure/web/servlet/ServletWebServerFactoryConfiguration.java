@@ -61,8 +61,8 @@ import org.springframework.context.annotation.Configuration;
 class ServletWebServerFactoryConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
-	// 当前Embedded容器只有在Tomcat已经创建的情况下 再回创建
-	@ConditionalOnClass({ Servlet.class, Tomcat.class, UpgradeProtocol.class })
+	// 当前Embedded容器只有在Tomcat已经创建的情况下 再会创建
+	@ConditionalOnClass({ Servlet.class, Tomcat.class, UpgradeProtocol.class }) // 条件装配 有Tomcat时候才会创建TomcatServletWebServerFactory
 	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
 	static class EmbeddedTomcat {
 
